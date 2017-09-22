@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HorScrollView.iml" filepath="$PROJECT_DIR$/HorScrollView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SuperScrollView.iml" filepath="$PROJECT_DIR$/SuperScrollView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/superscrollview/superscrollview.iml" filepath="$PROJECT_DIR$/superscrollview/superscrollview.iml" />
       <module fileurl="file://$PROJECT_DIR$/superscrollview/superscrollview.iml" filepath="$PROJECT_DIR$/superscrollview/superscrollview.iml" />
     </modules>
   </component>

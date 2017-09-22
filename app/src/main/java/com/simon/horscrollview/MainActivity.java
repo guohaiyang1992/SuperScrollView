@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.simon.view.BaseAdapter;
+import com.simon.view.SuperScrollView;
+
 public class MainActivity extends AppCompatActivity {
     SuperScrollView superScrollView;
     SuperAdapter adapter;

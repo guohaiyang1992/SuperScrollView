@@ -23,6 +23,7 @@
             android:text="1" />
 
         <TextView
+            android:id="@+id/people_bg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
