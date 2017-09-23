@@ -111,10 +111,11 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
                 return getMeasuredWidth() - child.getMeasuredWidth();
             }
 
-            @Override
-            public int getViewVerticalDragRange(View child) {
-                return getMeasuredHeight() - child.getMeasuredHeight();
-            }
+            //--屏蔽此处方法，防止垂直滑动冲突--
+//            @Override
+//            public int getViewVerticalDragRange(View child) {
+//                return getMeasuredHeight() - child.getMeasuredHeight();
+//            }
 
             @Override
             public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
