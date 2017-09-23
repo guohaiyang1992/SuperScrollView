@@ -22,6 +22,6 @@
 
 ```
 dependencies {
-     compile 'com.github.guohaiyang1992:SuperScrollView:1.0'
+     compile 'com.github.guohaiyang1992:SuperScrollView:1.1'
 	}
 ```
