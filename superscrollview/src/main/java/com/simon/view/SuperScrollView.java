@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.List;
  * 3.增加其他view 的动画
  */
 
-public class SuperScrollView extends ViewGroup {
+public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlobalLayoutListener {
     //--TAG--
     private static final String TAG = "SuperScrollView";
     //--处理滑动的辅助工具--
@@ -189,7 +190,7 @@ public class SuperScrollView extends ViewGroup {
             midView.setScaleX(percent);
             midView.setScaleY(percent);
             midView.setAlpha(percent);
-            Log.v(TAG, "当前缩放比例为： " + percent);
+            print("当前缩放比例为： " + percent);
         }
 
     }
@@ -281,16 +282,16 @@ public class SuperScrollView extends ViewGroup {
 
 
     /**
-     * 防止获取 宽高为0 的问题
+     * 防止获取 宽高为0 的问题,焦点变化会回调此处可能会导致回调多次
      *
      * @param hasWindowFocus
      */
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
-        midPostionX = getWidth() / 2;
-        Log.v(TAG, "获取当前的中间位置为： " + midPostionX);
-        scrollToChildPosition(defaultPostion);
+//        midPostionX = getWidth() / 2;
+//        Log.v(TAG, "获取当前的中间位置为： " + midPostionX);
+//        scrollToChildPosition(defaultPostion);
     }
 
     /**
@@ -419,4 +420,36 @@ public class SuperScrollView extends ViewGroup {
 
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        getViewTreeObserver().addOnGlobalLayoutListener(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        getViewTreeObserver().removeOnGlobalLayoutListener(this);
+    }
+
+    /**
+     * 此处回调的时候，getWidth 和getMearsureWidth 一定有值
+     */
+    @Override
+    public void onGlobalLayout() {
+        midPostionX = getWidth() / 2;
+        print("获取当前的中间位置为： " + midPostionX);
+        scrollToChildPosition(defaultPostion);
+    }
+
+    /**
+     * 仅仅在debug模式下打印log
+     *
+     * @param info
+     */
+    private void print(String info) {
+        if (BuildConfig.DEBUG) {
+            Log.v(TAG, info);
+        }
+    }
 }
