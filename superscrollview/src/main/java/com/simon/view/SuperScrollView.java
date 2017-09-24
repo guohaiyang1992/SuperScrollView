@@ -1,7 +1,11 @@
 package com.simon.view;
 
+
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.BuildConfig;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -57,6 +61,9 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
     //--默认选中点--
     private int defaultPostion = 0;
 
+    //--是否滑动过default--
+    private boolean isScrollToDefault = false;
+
     //-------------------构造函数------------------------
     public SuperScrollView(Context context) {
         this(context, null);
@@ -111,7 +118,6 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
                 return getMeasuredWidth() - child.getMeasuredWidth();
             }
 
-            //--屏蔽此处方法，防止垂直滑动冲突--
 //            @Override
 //            public int getViewVerticalDragRange(View child) {
 //                return getMeasuredHeight() - child.getMeasuredHeight();
@@ -175,24 +181,42 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
      * @param dx          x方向变化数据
      */
     private void dispatchOtherViewPositionChanged(View changedView, int dx) {
+        //--动画处理--
+        View midView = getMidView();
+        //--小优化 用于标志是否设置过中，防止重复设置--
+        boolean isSetMid = false;
+        //--percent--
+        float percent = 1f + (0.4f * (1 - getMidViewPercent()));
+
+
         for (View view : childList) {
+
+            //--如果是null,设置下一个--
+            if (view == null) {
+                continue;
+            }
+
             //--移动处理--
             if (!view.equals(changedView)) {
                 view.offsetLeftAndRight(dx);
             }
-            //--other view 设置透明度为0.5f--
-            view.setAlpha(0.5f);
+
+            //--针对不同view设置不同值--
+            if (!isSetMid && view.equals(midView)) {
+                midView.setScaleX(percent);
+                midView.setScaleY(percent);
+                midView.setAlpha(percent);
+                isSetMid = true;
+                print("当前缩放比例为： " + percent);
+            } else { //用于恢复其他view的状态
+                view.setScaleX(1f);
+                view.setScaleY(1f);
+                //--other view 设置透明度为0.5f--
+                view.setAlpha(0.5f);
+            }
+
         }
 
-        //--动画处理--
-        View midView = getMidView();
-        if (midView != null) {
-            float percent = 1f + (0.4f * (1 - getMidViewPercent()));
-            midView.setScaleX(percent);
-            midView.setScaleY(percent);
-            midView.setAlpha(percent);
-            print("当前缩放比例为： " + percent);
-        }
 
     }
 
@@ -283,19 +307,6 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
 
 
     /**
-     * 防止获取 宽高为0 的问题,焦点变化会回调此处可能会导致回调多次
-     *
-     * @param hasWindowFocus
-     */
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-//        midPostionX = getWidth() / 2;
-//        Log.v(TAG, "获取当前的中间位置为： " + midPostionX);
-//        scrollToChildPosition(defaultPostion);
-    }
-
-    /**
      * 获取childViews
      *
      * @return 获取所有的子view 返回list形式
@@ -333,7 +344,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
     public void setAdapter(BaseAdapter adapter) {
         this.adapter = adapter;
         initChildView();
-        scrollToChildPosition(defaultPostion);
+        scrollToDefault();
     }
 
     /**
@@ -341,7 +352,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
      *
      * @param position
      */
-    private void scrollToChildPosition(int position) {
+    public void scrollToChildPosition(int position) {
         //--check position--
         if (position <= count - 1 && mDragger != null) {
             View midView = childList.get(position);
@@ -440,7 +451,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
     public void onGlobalLayout() {
         midPostionX = getWidth() / 2;
         print("获取当前的中间位置为： " + midPostionX);
-        scrollToChildPosition(defaultPostion);
+        scrollToDefault();
     }
 
     /**
@@ -449,8 +460,22 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
      * @param info
      */
     private void print(String info) {
-        if (BuildConfig.DEBUG) {
-            Log.v(TAG, info);
-        }
+        Log.v(TAG, info);
     }
+
+    /**
+     * 滑动到默认位置
+     */
+    private void scrollToDefault() {
+        //--如果之前滑动过默认位置则此处不再滑动(增加判断是否等于0 有的时候即使layout 的时候仍然为0比如在视图隐藏的时候)--
+        if (isScrollToDefault && midPostionX == 0) {
+            return;
+        }
+        //--之前没滑动过--
+        scrollToChildPosition(defaultPostion);
+        //--重置状态防止再次滑动到默认--
+        isScrollToDefault = true;
+        print("滑动到默认位置");
+    }
+
 }
