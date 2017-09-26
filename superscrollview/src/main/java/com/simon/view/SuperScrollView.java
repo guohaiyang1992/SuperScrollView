@@ -1,6 +1,5 @@
 package com.simon.view;
 
-
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -40,7 +39,7 @@ import java.util.List;
  * 3.增加其他view 的动画
  */
 
-public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlobalLayoutListener {
+public class SuperScrollView extends ViewGroup {
     //--TAG--
     private static final String TAG = "SuperScrollView";
     //--处理滑动的辅助工具--
@@ -128,7 +127,6 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
                 super.onViewPositionChanged(changedView, left, top, dx, dy);
                 dispatchOtherViewPositionChanged(changedView, dx);
             }
-
 
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
@@ -296,7 +294,9 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
             right = cr + rightMargin;
             childView.layout(cl, ct, cr, cb);
         }
-
+        print("-----onLayout----");
+        //--此处滚动到默认位置--
+        scrollToDefault();
     }
 
     //--viewdraghelper 需要重写此处--
@@ -320,7 +320,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
         }
         //--删除之前的子view--
         removeAllViews();
-        //--遍历添加新的view--
+        //--遍历添加--
         for (int i = 0; i < result.size(); i++) {
             addView(result.get(i));
         }
@@ -347,7 +347,6 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
     public void setAdapter(BaseAdapter adapter) {
         this.adapter = adapter;
         initChildView();
-        scrollToDefault();
     }
 
     /**
@@ -435,27 +434,6 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
 
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        getViewTreeObserver().addOnGlobalLayoutListener(this);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        getViewTreeObserver().removeOnGlobalLayoutListener(this);
-    }
-
-    /**
-     * 此处回调的时候，getWidth 和getMearsureWidth 一定有值
-     */
-    @Override
-    public void onGlobalLayout() {
-        midPostionX = getWidth() / 2;
-        print("获取当前的中间位置为： " + midPostionX);
-        scrollToDefault();
-    }
 
     /**
      * 仅仅在debug模式下打印log
@@ -470,6 +448,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
      * 滑动到默认位置
      */
     private void scrollToDefault() {
+        midPostionX = getWidth() / 2;
         //--如果之前滑动过默认位置则此处不再滑动(增加判断是否等于0 有的时候即使layout 的时候仍然为0比如在视图隐藏的时候)--
         if (isScrollToDefault && midPostionX == 0) {
             return;
