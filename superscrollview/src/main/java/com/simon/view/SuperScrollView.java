@@ -129,6 +129,7 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
                 dispatchOtherViewPositionChanged(changedView, dx);
             }
 
+
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
                 super.onViewReleased(releasedChild, xvel, yvel);
@@ -317,7 +318,9 @@ public class SuperScrollView extends ViewGroup implements ViewTreeObserver.OnGlo
         if (adapter != null && adapter.getCount() != 0) {
             result = adapter.getChildViews();
         }
-        //--遍历添加--
+        //--删除之前的子view--
+        removeAllViews();
+        //--遍历添加新的view--
         for (int i = 0; i < result.size(); i++) {
             addView(result.get(i));
         }
